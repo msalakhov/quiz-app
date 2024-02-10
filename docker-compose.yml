@@ -1,0 +1,58 @@
+version: '3.9'
+services:
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    volumes:
+      - "${PROJECT_ROOT_PATH:-./app}:/app"
+    ports:
+      - "${NGINX_HOST_PORT:-80}:80"
+    depends_on:
+      - php-fpm
+    networks:
+      - textmagic-net
+  php-fpm:
+    build:
+      context: ./docker/php-fpm
+      dockerfile: Dockerfile
+    volumes:
+      - "${PROJECT_ROOT_PATH:-./app}:/app"
+    depends_on:
+      - postgres
+    networks:
+      - textmagic-net
+  php-cli:
+    build:
+      context: docker/php-cli
+      dockerfile: Dockerfile
+    user: www-data
+    volumes:
+      - "${PROJECT_ROOT_PATH:-./app}:/app"
+    environment:
+      - "COMPOSER_ALLOW_SUPERUSER=1"
+    depends_on:
+      - postgres
+    tty: true
+    networks:
+      - textmagic-net
+  postgres:
+    image: postgres
+    volumes:
+      - textmagic-pgsql:/var/lib/postgresql/data
+    environment:
+      - "POSTGRES_PASSWORD=${DB_PASSWORD}"
+      - "POSTGRES_USER=${DB_USERNAME}"
+      - "POSTGRES_DB=${DB_NAME}"
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    networks:
+      - textmagic-net
+volumes:
+  textmagic-pgsql:
+networks:
+  textmagic-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.96.0/24"

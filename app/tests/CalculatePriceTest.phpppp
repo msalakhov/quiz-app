@@ -1,0 +1,62 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests;
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use App\Entity\Discount\Discount;
+use App\Entity\Discount\DiscountType;
+use App\Entity\Product\Product;
+use App\Entity\Tax\Tax;
+
+class CalculatePriceTest extends ApiTestCase
+{
+    public function testPostCalculatePrice(): void
+    {
+        $price = '231';
+        $couponCode = 'M33';
+        $discountAmount = '20';
+        $taxCountryCode = 'IT';
+        $taxAmount = '22';
+
+        $product = (new Product())
+            ->setId(1)
+            ->setPrice($price);
+
+        dd($product);
+
+        (new Discount())
+            ->setId(1)
+            ->setCode($couponCode)
+            ->setDiscountType(DiscountType::FIXED)
+            ->setAmount($discountAmount);
+
+        (new Tax())
+            ->setId(1)
+            ->setCountryCode($taxCountryCode)
+            ->setAmount($taxAmount);
+
+        $response = static::createClient()
+            ->request(
+                'POST',
+                '/calculate-price',
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'accept' => 'application/json',
+                    ],
+                    'json' => [
+                        'product' => 1,
+                        'taxNumber' => 'IT12345678900',
+                        'couponCode' => $couponCode,
+                    ],
+                ]
+            );
+
+        $this->assertResponseIsSuccessful();
+        $data = $response->toArray();
+
+        dd($data);
+    }
+}
