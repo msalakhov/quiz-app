@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="mt-5 mb-4">
+            <h1 class="text-center">{{ question.content }}</h1>
+        </div>
+
+        <div class="row">
+            <form action="" method="post">
+                <input type="hidden" name="question" value="{{ question.id }}">
+                {% for answer in question.answers %}
+                    <div class="row">
+                        <label>
+                            <input type="checkbox" name="answers[]" value="{{ answer.id }}" id="{{ answer.id }}">
+                            {{ answer.content }}
+                        </label>
+                    </div>
+                {% endfor %}
+                <button type="submit">Next</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
