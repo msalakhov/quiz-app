@@ -17,3 +17,10 @@ create-migration:
 	docker-compose exec php-cli php bin/console make:migration
 migrate:
 	docker-compose exec php-cli php bin/console doctrine:migrations:migrate --no-interaction
+
+docker-start:
+	docker compose up -d
+composer-install:
+	docker compose exec php-cli composer install -vv -o
+
+start: docker-start composer-install migrate
