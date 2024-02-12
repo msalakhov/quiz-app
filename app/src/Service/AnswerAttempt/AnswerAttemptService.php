@@ -43,10 +43,10 @@ class AnswerAttemptService
     /**
      * @param string[] $answerIds
      */
-    public function createAnswerAttempt(string $testId, string $questionId, array $answerIds): AnswerAttempt
+    public function createAnswerAttempt(int $testId, int $questionId, array $answerIds): AnswerAttempt
     {
-        $test = $this->testRepository->getById((int) $testId);
-        $question = $this->questionRepository->getById((int) $questionId);
+        $test = $this->testRepository->getById($testId);
+        $question = $this->questionRepository->getById($questionId);
         $answers = $this->answerRepository->findByIds($answerIds);
         $answerAttempt = (new AnswerAttempt())
             ->setTest($test)
@@ -67,5 +67,52 @@ class AnswerAttemptService
         $this->entityManager->flush();
 
         return $answerAttempt;
+    }
+
+    /**
+     * @return AnswerAttempt[]
+     */
+    private function findCorrectAnswerAttemptsQuestions(int $testId): array
+    {
+        return $this->answerAttemptRepository->findCorrectAnswerAttemptsByTestId($testId);
+    }
+
+    /**
+     * @return AnswerAttempt[]
+     */
+    private function findWrongAnswerAttemptsQuestions(int $testId): array
+    {
+        return $this->answerAttemptRepository->findWrongAnswerAttemptsByTestId($testId);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getQuestionContentFromAnswerAttempts(array $answerAttempts): array
+    {
+        return array_map(
+            fn (AnswerAttempt $answerAttempt): string => $answerAttempt->getQuestion()->getContent(),
+            $answerAttempts
+        );
+    }
+
+    /**
+     * @return string[]
+     */
+    public function findCorrectAnsweredQuestions(int $testId): array
+    {
+        return $this->getQuestionContentFromAnswerAttempts(
+            $this->findCorrectAnswerAttemptsQuestions($testId)
+        );
+    }
+
+    /**
+     * @return string[]
+     */
+    public function findWrongAnsweredQuestions(int $testId): array
+    {
+        return $this->getQuestionContentFromAnswerAttempts(
+            $this->findWrongAnswerAttemptsQuestions($testId)
+        );
     }
 }

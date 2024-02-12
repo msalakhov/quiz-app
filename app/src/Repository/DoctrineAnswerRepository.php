@@ -4,8 +4,6 @@ namespace App\Repository;
 
 use App\Entity\Answer\Answer;
 use App\Entity\Answer\AnswerRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 
 class DoctrineAnswerRepository implements AnswerRepository

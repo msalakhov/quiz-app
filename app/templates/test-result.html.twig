@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="mt-5 mb-4">
+            <h1 class="text-center">Results</h1>
+        </div>
+
+        <div class="row">
+            <h2>Correct answered questions</h2>
+            {% for question in result.correct %}
+                <div class="row">
+                    {{ question }}
+                </div>
+            {% endfor %}
+
+            <h2>Wrong answered questions</h2>
+            {% for question in result.wrong %}
+                <div class="row">
+                    {{ question }}
+                </div>
+            {% endfor %}
+
+            <form action="/" method="post">
+                <button type="submit">begin new test</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

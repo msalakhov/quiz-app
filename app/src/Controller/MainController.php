@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Form\TestFormType;
-use App\Service\AnswerAttempt\AnswerAttemptService;
-use App\Service\Question\QuestionService;
 use App\Service\Test\TestService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,11 +12,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class MainController extends AbstractController
 {
+    public function __construct(private TestService $testService)
+    {
+    }
+
     #[Route(path: '/', name: 'begin_test_page', methods: ['GET', 'POST'])]
-    public function beginTest(Request $request, TestService $testService): Response
+    public function beginTest(Request $request): Response
     {
         if ($request->getMethod() === 'POST') {
-            $testId = $testService->createTest();
+            $testId = $this->testService->createTest();
             return $this->redirectToRoute('test_process_page', ['testId' => $testId]);
         }
 
@@ -29,24 +30,41 @@ class MainController extends AbstractController
         );
     }
 
-    #[Route(path: '/test', name: 'test_process_page', methods: ['GET', 'POST'])]
-    public function processTest(Request $request, QuestionService $questionService, AnswerAttemptService $answerAttemptService)
+    #[Route(path: '/test/{testId}', name: 'test_process_page', methods: ['GET', 'POST'])]
+    public function processTest(int $testId, Request $request)
     {
         if ($request->getMethod() === 'POST') {
             /** @todo make it async */
-            $answerAttemptService->createAnswerAttempt(
-                $request->get('testId'),
-                $request->get('question'),
+            $this->testService->writeQuestionAnswers(
+                $testId,
+                (int) $request->get('question'),
                 $request->get('answers')
             );
         }
 
-        $question = $questionService->getRandomQuestion();
+        $question = $this->testService->getNextQuestion($testId);
+
+        if ($question === null) {
+            return $this->redirectToRoute('test_result_page', ['testId' => $testId]);
+        }
 
         return $this->render(
             'test.html.twig',
             [
                 'question' => $question,
+            ]
+        );
+    }
+
+    #[Route(path: '/test/{testId}/result', name: 'test_result_page')]
+    public function testResult(int $testId): Response
+    {
+        $result = $this->testService->getResult($testId);
+
+        return $this->render(
+            'test-result.html.twig',
+            [
+                'result' => $result,
             ]
         );
     }

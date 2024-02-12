@@ -8,12 +8,18 @@ use Doctrine\ORM\EntityNotFoundException;
 interface QuestionRepository
 {
     /**
+     * @param int[] $questionIds
      * @return Question[]
      */
-    public function getAll(): Collection;
+    public function findAllExceptIds(array $questionIds): array;
 
     /**
      * @throws EntityNotFoundException
      */
     public function getById(int $questionId): Question;
+
+    /**
+     * @return Question[]
+     */
+    public function findAll(): array;
 }

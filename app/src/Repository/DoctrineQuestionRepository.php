@@ -6,8 +6,6 @@ namespace App\Repository;
 
 use App\Entity\Question\Question;
 use App\Entity\Question\QuestionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 
@@ -15,20 +13,6 @@ class DoctrineQuestionRepository implements QuestionRepository
 {
     public function __construct(private EntityManagerInterface $entityManager)
     {
-    }
-
-    public function getAll(): Collection
-    {
-        /** @var Question[] $questions */
-        $questions = $this
-            ->entityManager
-            ->createQueryBuilder()
-            ->select('q')
-            ->from(Question::class, 'q')
-            ->getQuery()
-            ->getResult();
-
-        return new ArrayCollection($questions);
     }
 
     public function getById(int $questionId): Question
@@ -43,5 +27,28 @@ class DoctrineQuestionRepository implements QuestionRepository
         }
 
         return $question;
+    }
+
+    public function findAllExceptIds(array $questionIds): array
+    {
+        $queryBuilder = $this
+            ->entityManager
+            ->createQueryBuilder();
+
+        return $queryBuilder
+            ->select('q')
+            ->from(Question::class, 'q')
+            ->where('q.id NOT IN (:ids)')
+            ->setParameter('ids', $questionIds)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAll(): array
+    {
+        return $this
+            ->entityManager
+            ->getRepository(Question::class)
+            ->findAll();
     }
 }

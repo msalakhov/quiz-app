@@ -2,27 +2,41 @@
 
 namespace App\Service\Question;
 
+use App\Entity\AnswerAttempt\AnswerAttempt;
+use App\Entity\AnswerAttempt\AnswerAttemptRepository;
 use App\Entity\Question\Question;
 use App\Entity\Question\QuestionRepository;
-use Doctrine\Common\Collections\Collection;
 
 class QuestionService
 {
-    public function __construct(private QuestionRepository $questionRepository)
+    public function __construct(
+        private QuestionRepository $questionRepository,
+        private AnswerAttemptRepository $answerAttemptRepository
+    )
     {
     }
 
-    private function getQuestions(): Collection
+    public function getRandomQuestionForTest(int $testId): ?Question
     {
-        return $this->questionRepository->getAll();
+        $answerAttempts = $this->answerAttemptRepository->findAllByTestId($testId);
+
+        $answeredQuestionIds = array_map(
+            fn (AnswerAttempt $answerAttempt): int => (int) $answerAttempt->getQuestion()->getId(),
+            $answerAttempts
+        );
+
+        if (count($answeredQuestionIds) > 0) {
+            $availableQuestions = $this->questionRepository->findAllExceptIds($answeredQuestionIds);
+        } else {
+            $availableQuestions = $this->questionRepository->findAll();
+        }
+
+        if (count($availableQuestions) === 0) {
+            return null;
+        }
+
+        $questionIndex = rand(0, count($availableQuestions) - 1);
+
+        return $availableQuestions[$questionIndex];
     }
-
-    public function getRandomQuestion()
-    {
-        $questions = $this->getQuestions();
-        $questionIndex = rand(0, $questions->count());
-
-        return $questions[$questionIndex];
-    }
-
 }
