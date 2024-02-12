@@ -2,39 +2,45 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Entity\AnswerAttempt;
 
+use App\Entity\Answer\Answer;
+use App\Entity\Question\Question;
+use App\Entity\Test\Test;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
-use Doctrine\ORM\Mapping\OneToMany;
 
 #[Entity]
-class Question
+class AnswerAttempt
 {
     #[Id]
     #[GeneratedValue]
     #[Column(type: 'integer')]
     private ?int $id;
 
-    #[Column(type: 'string', unique: true)]
-    private string $content;
+    #[ManyToOne(targetEntity: Test::class, inversedBy: 'answerAttempts')]
+    #[JoinColumn(name: 'test', referencedColumnName: 'id', nullable: false)]
+    private Test $test;
 
-    #[OneToMany(targetEntity: Answer::class, mappedBy: 'question', orphanRemoval: true)]
+    #[ManyToOne(targetEntity: Question::class)]
+    private Question $question;
+
+    #[ManyToMany(targetEntity: Answer::class)]
     private Collection $answers;
 
-    #[ManyToOne(targetEntity: AnswerAttempt::class, inversedBy: 'question')]
-    private Collection $answerAttempts;
+    #[Column(type: 'boolean')]
+    private bool $correct;
 
     public function __construct()
     {
         $this->answers = new ArrayCollection();
-        $this->answerAttempts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -49,14 +55,26 @@ class Question
         return $this;
     }
 
-    public function getContent(): string
+    public function getTest(): Test
     {
-        return $this->content;
+        return $this->test;
     }
 
-    public function setContent(string $content): self
+    public function setTest(Test $test): self
     {
-        $this->content = $content;
+        $this->test = $test;
+
+        return $this;
+    }
+
+    public function getQuestion(): Question
+    {
+        return $this->question;
+    }
+
+    public function setQuestion(Question $question): self
+    {
+        $this->question = $question;
 
         return $this;
     }
@@ -82,14 +100,21 @@ class Question
         return $this;
     }
 
-    public function getAnswerAttempts(): Collection
+    public function removeAnswer(Answer $answer): self
     {
-        return $this->answerAttempts;
+        $this->answers->removeElement($answer);
+
+        return $this;
     }
 
-    public function setAnswerAttempts(Collection $answerAttempts): self
+    public function isCorrect(): bool
     {
-        $this->answerAttempts = $answerAttempts;
+        return $this->correct;
+    }
+
+    public function setCorrect(bool $correct): self
+    {
+        $this->correct = $correct;
 
         return $this;
     }

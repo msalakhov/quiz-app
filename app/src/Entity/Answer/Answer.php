@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Entity\Answer;
 
+use App\Entity\Question\Question;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -25,7 +26,7 @@ class Answer
     #[Column(type: 'boolean')]
     private bool $correct;
 
-    #[ManyToOne(targetEntity: Question::class)]
+    #[ManyToOne(targetEntity: Question::class, inversedBy: 'answers')]
     #[JoinColumn(name: 'question', referencedColumnName: 'id', nullable: false)]
     private Question $question;
 
@@ -75,5 +76,10 @@ class Answer
         $this->question = $question;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->content;
     }
 }
