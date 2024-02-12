@@ -31,7 +31,7 @@ class MainController extends AbstractController
     }
 
     #[Route(path: '/test/{testId}', name: 'test_process_page', methods: ['GET', 'POST'])]
-    public function processTest(int $testId, Request $request)
+    public function processTest(int $testId, Request $request): Response
     {
         if ($request->getMethod() === 'POST') {
             /** @todo make it async */

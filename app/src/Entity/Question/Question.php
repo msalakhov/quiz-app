@@ -24,6 +24,7 @@ class Question
     #[Column(type: 'string', unique: true)]
     private string $content;
 
+    /** @var Collection<array-key, Answer> $answers */
     #[OneToMany(targetEntity: Answer::class, mappedBy: 'question', orphanRemoval: true)]
     private Collection $answers;
 
@@ -56,11 +57,17 @@ class Question
         return $this;
     }
 
+    /**
+     * @return Collection<array-key, Answer>
+     */
     public function getAnswers(): Collection
     {
         return $this->answers;
     }
 
+    /**
+     * @param Collection<array-key, Answer> $answers
+     */
     public function setAnswers(Collection $answers): self
     {
         $this->answers = $answers;

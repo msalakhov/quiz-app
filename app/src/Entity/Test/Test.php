@@ -21,6 +21,9 @@ class Test
     #[Column(type: 'integer')]
     private ?int $id;
 
+    /**
+     * @var Collection<array-key, AnswerAttempt> $answerAttempts
+     */
     #[OneToMany(targetEntity: AnswerAttempt::class, mappedBy: 'test')]
     private Collection $answerAttempts;
 
@@ -41,11 +44,17 @@ class Test
         return $this;
     }
 
+    /**
+     * @return Collection<array-key, AnswerAttempt>
+     */
     public function getAnswerAttempts(): Collection
     {
         return $this->answerAttempts;
     }
 
+    /**
+     * @param Collection<array-key, AnswerAttempt> $answerAttempts
+     */
     public function setAnswerAttempts(Collection $answerAttempts): self
     {
         $this->answerAttempts = $answerAttempts;

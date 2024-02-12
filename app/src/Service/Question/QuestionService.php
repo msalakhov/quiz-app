@@ -12,8 +12,7 @@ class QuestionService
     public function __construct(
         private QuestionRepository $questionRepository,
         private AnswerAttemptRepository $answerAttemptRepository
-    )
-    {
+    ) {
     }
 
     public function getRandomQuestionForTest(int $testId): ?Question

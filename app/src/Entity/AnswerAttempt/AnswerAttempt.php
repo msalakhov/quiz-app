@@ -32,6 +32,7 @@ class AnswerAttempt
     #[ManyToOne(targetEntity: Question::class)]
     private Question $question;
 
+    /** @var Collection<array-key, Answer>  */
     #[ManyToMany(targetEntity: Answer::class)]
     private Collection $answers;
 
@@ -79,11 +80,17 @@ class AnswerAttempt
         return $this;
     }
 
+    /**
+     * @return Collection<array-key, Answer>
+     */
     public function getAnswers(): Collection
     {
         return $this->answers;
     }
 
+    /**
+     * @param Collection<array-key, Answer> $answers
+     */
     public function setAnswers(Collection $answers): self
     {
         $this->answers = $answers;

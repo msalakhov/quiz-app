@@ -6,3 +6,6 @@ parameters:
         - public/
         - src/
         - tests/
+    checkGenericClassInNonGenericObjectType: false
+    inferPrivatePropertyTypeFromConstructor: true
+    checkMissingIterableValueType: false

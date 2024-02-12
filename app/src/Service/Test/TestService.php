@@ -20,8 +20,7 @@ class TestService
         private EntityManagerInterface $entityManager,
         private QuestionService $questionService,
         private AnswerAttemptService $answerAttemptService
-    )
-    {
+    ) {
     }
 
     public function createTest(): int

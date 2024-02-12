@@ -22,8 +22,7 @@ class AnswerAttemptService
         private AnswerAttemptRepository $answerAttemptRepository,
         private ValidatorInterface $validator,
         private EntityManagerInterface $entityManager
-    )
-    {
+    ) {
     }
 
     /**
